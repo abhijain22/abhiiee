@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Romantic Night Love Card</title>
+<style>
+  body {
+    margin: 0; font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom right, #1b003b, #4b006e);
+    overflow-x: hidden; position: relative; color:white;
+  }
+  .card { max-width: 800px; margin: 0 auto; background: rgba(0,0,0,0.7); border-radius: 30px; padding: 30px; position: relative; overflow: hidden; min-height: 80vh; }
+  h1,h2,h3 { text-align:center; color:#ff99cc; }
+  p { text-align:center; }
+  button { background:#ff4da6; color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; margin:5px; }
+  .page { display:none; position:relative; }
+  .active { display:block; }
+  .watermark { position:absolute; bottom:10px; left:10px; font-size:12px; color:#ff4da6; opacity:0.5; user-select:none; }
+  .moon { position:absolute; top:10%; left:50%; transform:translateX(-50%); font-size:180px; color:#fff8dc; opacity:0.1; pointer-events:none; }
+  .heart, .star { position:absolute; pointer-events:none; font-size:20px; opacity:0.8; animation-iteration-count: infinite; animation-timing-function: linear; }
+  .heart { color:#ff4da6; font-size: 25px; }
+  .star { color:#fff8dc; font-size: 15px; }
+  input[type=range]{ width:150px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="moon">🌙</div>
+
+  <!-- Pages -->
+  <div id="cover" class="page active">
+    <h1>Welcome My Angel 💖</h1>
+    <p>Enjoy this romantic night just for you ✨</p>
+    <button onclick="nextPage()">Next</button>
+  </div>
+  
+  <div id="message" class="page">
+    <h2>Message from Me</h2>
+    <textarea id="loveMsg" rows="5" style="width:100%; font-size:16px;">To my love — every moment with you is magical.</textarea>
+    <br>
+    <button onclick="copyMessage()">Copy Message</button>
+    <button onclick="prevPage()">Previous</button>
+    <button onclick="nextPage()">Next</button>
+  </div>
+  
+  <div id="gallery" class="page">
+    <h2>Gallery 📸</h2>
+    <p>Your photos go here!</p>
+    <button onclick="prevPage()">Previous</button>
+    <button onclick="nextPage()">Next</button>
+  </div>
+  
+  <div id="story" class="page">
+    <h2>Our Story ✨</h2>
+    <p>Timeline of our love together.</p>
+    <button onclick="prevPage()">Previous</button>
+    <button onclick="nextPage()">Next</button>
+  </div>
+  
+  <div id="games" class="page">
+    <h2>Games 🎮</h2>
+    <button onclick="winGame('You are my shining star 🌟')">Play Tic Tac Toe</button>
+    <button onclick="winGame('You won the Heart Clicker 💖')">Heart Clicker</button>
+    <button onclick="prevPage()">Previous</button>
+    <button onclick="nextPage()">Next</button>
+  </div>
+  
+  <div id="songs" class="page">
+    <h2>Songs 🎵</h2>
+    <h3 id="nowPlaying">Now Playing: You Are My Soniya</h3>
+    <audio id="songPlayer" src="https://drive.google.com/uc?export=download&id=10WI_af6cMGmPluNlHZfCDeB-Xl8jfG3u"></audio>
+    <br>
+    <button onclick="prevSong()">Prev</button>
+    <button onclick="playPauseSong()">Play/Pause</button>
+    <button onclick="nextSong()">Next</button>
+    <br><br>
+    Volume: <input type="range" min="0" max="1" step="0.01" id="volSlider" onchange="changeVolume(this.value)">
+    <br>
+    Progress: <input type="range" min="0" max="100" step="1" id="progressSlider" onchange="seekSong(this.value)">
+    <br><br>
+    <button onclick="selectSong(0)">You Are My Soniya</button>
+    <button onclick="selectSong(1)">Bebo – Jungkook Edit</button>
+    <button onclick="selectSong(2)">Zaalima Lyrics</button>
+    <button onclick="selectSong(3)">Tum Ho Toh</button>
+    <button onclick="selectSong(4)">Kushagra - Finding Her</button>
+    <br><br>
+    <button onclick="prevPage()">Previous</button>
+    <button onclick="nextPage()">Next</button>
+  </div>
+  
+  <div id="forever" class="page">
+    <h2>Forever & Always ❤️✨</h2>
+    <button onclick="prevPage()">Previous</button>
+  </div>
+
+  <div class="watermark">— Abhiiee 💖</div>
+</div>
+
+<!-- Background Music -->
+<audio id="bgMusic" src="https://drive.google.com/uc?export=download&id=1wByON3vPptNIwEXSd-mlUYLJy9OACGyQ" autoplay loop></audio>
+
+<!-- Win Popup -->
+<div id="winPopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:20px; text-align:center; box-shadow:0 0 20px pink;">
+  <h2>💖</h2>
+  <p id="winMsg"></p>
+</div>
+
+<script>
+// === Pages ===
+let pages = ['cover','message','gallery','story','games','songs','forever'];
+let current = 0;
+
+function showPage(i){
+  pages.forEach(p => document.getElementById(p).classList.remove('active'));
+  document.getElementById(pages[i]).classList.add('active');
+  current = i;
+}
+
+function nextPage(){ showPage(Math.min(current+1,pages.length-1)); }
+function prevPage(){ showPage(Math.max(current-1,0)); }
+
+// Copy message
+function copyMessage(){ navigator.clipboard.writeText(document.getElementById('loveMsg').value); alert("Copied!"); }
+
+// Games
+function winGame(msg){
+  document.getElementById('winMsg').innerText = msg;
+  let popup = document.getElementById('winPopup');
+  popup.style.display = 'block';
+  setTimeout(()=>{ popup.style.display='none'; },3000);
+}
+
+// Songs
+let songIndex=0;
+let songList=[
+  {title:"You Are My Soniya", src:"https://drive.google.com/uc?export=download&id=10WI_af6cMGmPluNlHZfCDeB-Xl8jfG3u"},
+  {title:"Bebo – Jungkook Edit", src:"https://drive.google.com/uc?export=download&id=18Bh3inNpVPbRag0k4W3LYAsmTDy-zH2G"},
+  {title:"Zaalima Lyrics", src:"https://drive.google.com/uc?export=download&id=1bIvoIbTQsT7eqrJ6oKgQZTdQJS7Vr6gZ"},
+  {title:"Tum Ho Toh", src:"https://drive.google.com/uc?export=download&id=1cFsYiJ7AgUsqiaLAhLe1lnmP-Ln0n0pQ"},
+  {title:"Kushagra - Finding Her", src:"https://drive.google.com/uc?export=download&id=1uyEsEyp2GXdeDzjxS9tkITNiN7GjyoTE"}
+];
+let player=document.getElementById('songPlayer');
+
+function loadSong(){ player.src=songList[songIndex].src; document.getElementById('nowPlaying').innerText='Now Playing: '+songList[songIndex].title; }
+function playPauseSong(){ if(player.paused){player.play();}else{player.pause();} }
+function nextSong(){ songIndex=(songIndex+1)%songList.length; loadSong(); player.play(); }
+function prevSong(){ songIndex=(songIndex-1+songList.length)%songList.length; loadSong(); player.play(); }
+function selectSong(i){ songIndex=i; loadSong(); player.play(); }
+function changeVolume(v){ player.volume=v; }
+player.ontimeupdate=()=>{ document.getElementById('progressSlider').value=(player.currentTime/player.duration*100)||0; }
+function seekSong(v){ player.currentTime=player.duration*v/100; }
+
+// Background music
+let bgMusic=document.getElementById('bgMusic'); bgMusic.volume=0.1; bgMusic.loop=true; bgMusic.play();
+
+// Floating hearts and stars
+function createFloatingElements(){
+  for(let i=0;i<25;i++){
+    let heart=document.createElement('div'); heart.className='heart'; heart.innerText='💖';
+    heart.style.left=Math.random()*100+'vw'; heart.style.top=Math.random()*100+'vh'; heart.style.fontSize=(10+Math.random()*20)+'px';
+    heart.style.animation=`floatUp ${5+Math.random()*5}s linear infinite`; document.body.appendChild(heart);
+    let star=document.createElement('div'); star.className='star'; star.innerText='✨';
+    star.style.left=Math.random()*100+'vw'; star.style.top=Math.random()*100+'vh'; star.style.fontSize=(5+Math.random()*10)+'px';
+    star.style.animation=`floatUp ${3+Math.random()*4}s linear infinite`; document.body.appendChild(star);
+  }
+}
+
+window.onload=createFloatingElements;
+
+const style=document.createElement('style');
+style.innerHTML=`@keyframes floatUp {0%{transform:translateY(0);opacity:1;}100%{transform:translateY(-100vh);opacity:0;}}`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
